@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma-pull": "npx prisma db pull",
     "prisma-generate": "npx prisma generate",
-    "server": "nodemon index.ts"
+    "server": "nodemon main.ts"
   },
   "keywords": [],
   "author": "",
