@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User{
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  name String
+  surname String?
+
+  imageId String?
+  image AvatarImage? @relation(fields: [imageId],references: [id])
+  
+  accessTokens    AccessToken[]
+  emailProviders EmailProvider[]
+  favorites Favorite[]
+  items Item[]
+
+  chatUsers ChatUser[]
+  messages Message[]
+}
+
+model AccessToken{
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  token       String @unique
+  expiresIn   DateTime 
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+}
+
+model EmailProvider{
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  email         String
+  passwordhash  String
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+}
+
+
+model Favorite{  
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+
+  itemId String
+  item Item @relation(fields: [itemId],references: [id])
+}
+
+
+model TempFavoriteList{
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  tempFavorites TempFavorite[]
+}
+
+model TempFavorite{  
+  id        String   @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+
+  tempFavoriteListId String
+  tempFavoriteList TempFavoriteList @relation(fields: [tempFavoriteListId],references: [id], onDelete: Cascade)
+
+  itemId String
+  item Item @relation(fields: [itemId],references: [id])
+}
+
+
+model Item{
+  id        String @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  
+  lable String
+  price Int
+  description String?
+
+  mainImageId String?
+  mainImage ItemImage? @relation("mainImageItem", fields: [mainImageId],references: [id])
+
+  images ItemImage[] @relation("imagesItem")
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+
+  favorites Favorite[]
+  tempFavorites TempFavorite[]
+  chats Chat[]
+}
+
+model ItemImage{
+  id String @id @unique @default(uuid())
+  createAt DateTime @default(now())
+
+  items Item[] @relation("mainImageItem")
+
+  itemId String?
+  item Item? @relation("imagesItem",fields: [itemId],references: [id])
+
+  buffer  Bytes
+  buffer0 Bytes
+  buffer1 Bytes
+  buffer2 Bytes
+  buffer3 Bytes
+  size  Int
+  size0 Int
+  size1 Int
+  size2 Int
+  size3 Int
+}
+
+
+model AvatarImage{
+  id String @id @unique @default(uuid())
+  createAt DateTime @default(now())
+  
+  buffer  Bytes
+  buffer0 Bytes
+  buffer1 Bytes
+  size  Int
+  size0 Int
+  size1 Int
+
+  users User[]
+}
+
+
+model Chat{
+  id        String @id @default(uuid())
+  ceatedAt  DateTime @default(now())
+
+  itemId String?
+  item Item? @relation(fields: [itemId],references: [id])
+
+  messages Message[] @relation("messages_of_chat")
+  chatUsers ChatUser[]
+}
+
+model ChatUser{
+  id String @id @default(uuid())
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+
+  chatId String
+  chat Chat @relation(fields: [chatId],references: [id])
+}
+
+model Message{
+  id String @id @default(uuid())
+  ceatedAt DateTime @default(now())
+
+  text String
+
+  userId String
+  user User @relation(fields: [userId],references: [id])
+
+  chatId String
+  chat Chat @relation("messages_of_chat",fields: [chatId],references: [id])
+}
