@@ -1,0 +1,1 @@
+export const CHAT_COUNT_TAKE_MESSAGES = 64;
